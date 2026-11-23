@@ -735,6 +735,11 @@ def build_polymarket():
                 continue
             if re.search(r"alchemy|fusion|medal|olymp|golden|goldman|cup|card", title, re.I):
                 continue
+            # skip intraday micro-markets ("Up or Down - Nov 23, 3:00AM-3:15AM ET")
+            if re.search(r"\d{1,2}:\d{2}\s*[AP]M\s*-", title, re.I):
+                continue
+            if float(e.get("volume") or 0) < 1000:
+                continue
             seen.add(e.get("id"))
             mk = []
             for mm in e.get("markets") or []:
@@ -751,7 +756,9 @@ def build_polymarket():
             if mk:
                 out["events"].append({"title": title, "slug": e.get("slug"), "endDate": e.get("endDate"),
                                       "volume": clean(e.get("volume") or 0, 0), "markets": mk[:20]})
-        out["events"].sort(key=lambda x: x.get("endDate") or "")
+        # price-level markets first, then by volume
+        out["events"].sort(key=lambda x: (0 if re.search(r"hit|above|below|settle|close|price", x["title"], re.I) else 1, -(x.get("volume") or 0)))
+        out["events"] = out["events"][:8]
         log("polymarket", True, f"{len(out['events'])} events")
     except Exception as e:  # noqa: BLE001
         log("polymarket", False, str(e))
