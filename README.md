@@ -19,7 +19,7 @@ GoldPulse is a website about the gold market (English / Türkçe). It runs entir
 - **Seasonality lab** and a **Higher or Lower** game with a daily challenge.
 
 ## How it works
-`.github/workflows/update-and-deploy.yml` runs every 30 minutes. It runs `scripts/update_data.py`, which fetches data from Yahoo Finance, Stooq, FRED, CFTC, Google News, Polymarket, Truncgil and gold-api.com, and computes the analytics into `data/*.json`. It then deploys the site to GitHub Pages. To make the Turkish premium history and the news archive accumulate, each run reads the previous files back from the live site.
+`.github/workflows/update-and-deploy.yml` runs every 30 minutes. It runs `scripts/update_data.py`, which fetches data from Yahoo Finance (yfinance), US Treasury, BLS, CFTC, Google News, Polymarket, Truncgil and gold-api.com, and computes the analytics into `data/*.json`. It then deploys the site to GitHub Pages. To make the Turkish premium history and the news archive accumulate, each run reads the previous files back from the live site.
 
 Run locally: `pip install -r scripts/requirements.txt && python scripts/update_data.py` (or `--mock` for synthetic data), then `python -m http.server`.
 

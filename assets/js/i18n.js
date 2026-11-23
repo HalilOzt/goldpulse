@@ -6,7 +6,7 @@ const EN = {
   currency: 'Currency', unit: 'Unit', theme: 'Theme', loading: 'Loading…', no_data: 'Data not available yet. The data job runs every 30 minutes.',
   more: 'More', close: 'Close', refresh: 'Refresh', remove: 'Remove', updated: 'Updated', live: 'Live', delayed: 'Delayed', today: 'today',
   unit_oz: 'Troy ounce', unit_g: 'Gram', unit_kg: 'Kilogram', unit_g_short: 'g', unit_oz_short: 'oz',
-  footer: 'GoldPulse is an independent, open-source project for information only, <b>not investment advice</b>. Spot price: gold-api.com · History: COMEX futures via Yahoo Finance · Macro: FRED · Positioning: CFTC · News: Google News · Odds: Polymarket · Turkish prices: Truncgil · Reserves: World Gold Council. Data may be delayed or contain errors. <a href="#/about">Methodology & sources</a>',
+  footer: 'GoldPulse is an independent, open-source project for information only, <b>not investment advice</b>. Spot price: gold-api.com · History: COMEX futures via Yahoo Finance · Macro: US Treasury & BLS · Positioning: CFTC · News: Google News · Odds: Polymarket · Turkish prices: Truncgil · Reserves: World Gold Council. Data may be delayed or contain errors. <a href="#/about">Methodology & sources</a>',
   // dashboard
   dash_title: 'Gold dashboard', dash_sub: 'Live gold price and everything that moves it. Drag panels by their title bar, resize from the corner, and add or remove panels. Your layout is saved in this browser.',
   add_widget: 'Add panel', lock_layout: 'Lock layout', unlock_layout: 'Unlock layout', reset_layout: 'Reset', dash_hint: 'Tip: click any day on the chart to see that day’s news, drivers and sentiment.',
@@ -59,7 +59,7 @@ drv_rose: 'Gold rose', drv_fell: 'Gold fell', drv_flat: 'Gold was flat', drv_top
   // priced in gold
   pig_bigmac: 'A Big Mac', pig_oil: 'A barrel of oil', pig_wage: 'A month of average US pay', pig_house: 'Median US house', pig_spx: 'The S&P 500 index', pig_dji: 'The Dow Jones index', pig_btc: 'One Bitcoin',
   pig_title: 'The world priced in gold', pig_sub: 'Prices measured in gold instead of dollars. When the numbers fall, gold has gained purchasing power.',
-  pig_note: 'Change is measured since 2000 (or the first available date). Sources: The Economist Big Mac index, FRED (median house price, average weekly earnings), Yahoo Finance.',
+  pig_note: 'Change is measured since 2000 (or the first available date). Sources: The Economist Big Mac index, BLS (average weekly earnings), Yahoo Finance.',
   // tools
   tools_title: 'Gold tools', tools_sub: 'Calculators built on real historical prices.',
   tm_title: 'Gold time machine', tm_sub: 'What if you had bought gold on a date that matters to you: a birthday, a wedding, your first salary?',
@@ -108,7 +108,7 @@ drv_rose: 'Gold rose', drv_fell: 'Gold fell', drv_flat: 'Gold was flat', drv_top
   <h3>Data sources</h3><ul>
   <li><b>Live spot price</b>: gold-api.com (XAU/USD), every 20 seconds in your browser.</li>
   <li><b>Price history</b>: COMEX gold futures (GC=F), silver, dollar index, S&P 500, oil, Bitcoin and FX via Yahoo Finance. Long gold history via Stooq.</li>
-  <li><b>Macro</b>: FRED (10-year TIPS real yield, T-bills, US CPI, median house price, earnings, Turkish CPI).</li>
+  <li><b>Macro</b>: US Treasury (10-year real yield, T-bill rates), BLS (US CPI, average weekly earnings).</li>
   <li><b>Positioning</b>: CFTC Commitments of Traders (disaggregated, managed money).</li>
   <li><b>News</b>: Google News RSS, English and Turkish. Tagging and sentiment use simple keyword rules.</li>
   <li><b>Prediction markets</b>: Polymarket public API.</li>
@@ -128,7 +128,7 @@ const TR = {
   currency: 'Para birimi', unit: 'Birim', theme: 'Tema', loading: 'Yükleniyor…', no_data: 'Veri henüz hazır değil. Veri güncellemesi 30 dakikada bir çalışır.',
   more: 'Devamı', close: 'Kapat', refresh: 'Yenile', remove: 'Kaldır', updated: 'Güncellendi', live: 'Canlı', delayed: 'Gecikmeli', today: 'bugün',
   unit_oz: 'Ons', unit_g: 'Gram', unit_kg: 'Kilogram', unit_g_short: 'g', unit_oz_short: 'ons',
-  footer: 'GoldPulse yalnızca bilgilendirme amaçlı, bağımsız ve açık kaynaklı bir projedir; <b>yatırım tavsiyesi değildir</b>. Spot fiyat: gold-api.com · Geçmiş: Yahoo Finance üzerinden COMEX vadeli · Makro: FRED · Pozisyon: CFTC · Haberler: Google Haberler · Olasılıklar: Polymarket · Türkiye fiyatları: Truncgil · Rezervler: Dünya Altın Konseyi. Veriler gecikmeli veya hatalı olabilir. <a href="#/about">Yöntem ve kaynaklar</a>',
+  footer: 'GoldPulse yalnızca bilgilendirme amaçlı, bağımsız ve açık kaynaklı bir projedir; <b>yatırım tavsiyesi değildir</b>. Spot fiyat: gold-api.com · Geçmiş: Yahoo Finance üzerinden COMEX vadeli · Makro: ABD Hazinesi & BLS · Pozisyon: CFTC · Haberler: Google Haberler · Olasılıklar: Polymarket · Türkiye fiyatları: Truncgil · Rezervler: Dünya Altın Konseyi. Veriler gecikmeli veya hatalı olabilir. <a href="#/about">Yöntem ve kaynaklar</a>',
   dash_title: 'Altın paneli', dash_sub: 'Canlı altın fiyatı ve onu hareket ettiren her şey. Panelleri başlıklarından sürükleyin, köşeden boyutlandırın, ekleyin veya kaldırın. Düzeniniz bu tarayıcıda saklanır.',
   add_widget: 'Panel ekle', lock_layout: 'Düzeni kilitle', unlock_layout: 'Kilidi aç', reset_layout: 'Sıfırla', dash_hint: 'İpucu: o günün haberlerini, etkenlerini ve duyarlılığını görmek için grafikte herhangi bir güne tıklayın.',
   w_price: 'Canlı fiyat', w_chart: 'Etkileşimli grafik', w_tvchart: 'TradingView canlı grafik', w_feargreed: 'Altın Korku & Açgözlülük', w_drivers: 'Altın neden hareket etti?',
@@ -173,7 +173,7 @@ const TR = {
   ratio: 'Oran', now: 'Şimdi', pct_hist: 'Tarihsel %', pct_hist_tip: 'Bugünkü değerin tüm geçmişteki yüzdelik dilimi', ratio_gold_silver: 'Altın / Gümüş', ratio_gold_oil: 'Altın / Petrol (varil)', ratio_spx_gold: 'S&P 500 / Altın', ratio_dow_gold: 'Dow / Altın', ratio_btc_gold: 'Bitcoin / Altın',
   pig_bigmac: 'Bir Big Mac', pig_oil: 'Bir varil petrol', pig_wage: 'ABD’de bir aylık ortalama maaş', pig_house: 'ABD medyan konut', pig_spx: 'S&P 500 endeksi', pig_dji: 'Dow Jones endeksi', pig_btc: 'Bir Bitcoin',
   pig_title: 'Altın cinsinden dünya', pig_sub: 'Dolar yerine altınla ölçülen fiyatlar. Rakamlar düştükçe altının satın alma gücü artmış demektir.',
-  pig_note: 'Değişim 2000’den (veya ilk mevcut tarihten) itibaren hesaplanır. Kaynaklar: The Economist Big Mac endeksi, FRED (medyan konut fiyatı, ortalama haftalık kazanç), Yahoo Finance.',
+  pig_note: 'Değişim 2000’den (veya ilk mevcut tarihten) itibaren hesaplanır. Kaynaklar: The Economist Big Mac endeksi, BLS (ortalama haftalık kazanç), Yahoo Finance.',
   tools_title: 'Altın araçları', tools_sub: 'Gerçek geçmiş fiyatlara dayanan hesaplayıcılar.',
   tm_title: 'Altın zaman makinesi', tm_sub: 'Sizin için önemli bir tarihte altın alsaydınız ne olurdu: bir doğum günü, düğün ya da ilk maaşınız?',
   tm_date: 'Alış tarihi', tm_amount: 'Yatırılan tutar', tm_nodata: 'Bu tarih için fiyat verisi yok.', peak: 'zirve', bottom: 'dip',
@@ -216,7 +216,7 @@ const TR = {
   <h3>Veri kaynakları</h3><ul>
   <li><b>Canlı spot fiyat</b>: gold-api.com (XAU/USD), tarayıcınızda 20 saniyede bir.</li>
   <li><b>Fiyat geçmişi</b>: Yahoo Finance üzerinden COMEX altın vadelisi (GC=F), gümüş, dolar endeksi, S&P 500, petrol, Bitcoin ve kurlar. Uzun dönem altın verisi Stooq’tan.</li>
-  <li><b>Makro</b>: FRED (10 yıllık TIPS reel faizi, hazine bonoları, ABD TÜFE, medyan konut fiyatı, kazançlar, Türkiye TÜFE).</li>
+  <li><b>Makro</b>: ABD Hazinesi (10 yıllık reel faiz, hazine bonosu faizleri), BLS (ABD TÜFE, ortalama haftalık kazanç).</li>
   <li><b>Pozisyonlar</b>: CFTC Commitments of Traders (ayrıştırılmış, fon yöneticileri).</li>
   <li><b>Haberler</b>: Google Haberler RSS, İngilizce ve Türkçe. Etiketleme ve duyarlılık basit anahtar kelime kurallarıyla yapılır.</li>
   <li><b>Tahmin piyasaları</b>: Polymarket açık API.</li>

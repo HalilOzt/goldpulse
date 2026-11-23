@@ -290,16 +290,7 @@ def collect():
         except Exception as e:  # noqa: BLE001
             log(key, False, str(e)[:120])
         time.sleep(0.5)
-    # 3) macro: FRED first (short timeout), then official fallbacks
-    for key, sid in FRED.items():
-        try:
-            r = http_get("https://fred.stlouisfed.org/graph/fredgraph.csv", params={"id": sid}, tries=1, timeout=40)
-            df = pd.read_csv(io.StringIO(r.text))
-            vals = pd.to_numeric(df[sid], errors="coerce")
-            m[key] = pd.Series(vals.values, index=pd.to_datetime(df[df.columns[0]])).dropna()
-            log(key, True, f"FRED {sid} {len(m[key])} rows")
-        except Exception as e:  # noqa: BLE001
-            log(key, False, "FRED " + str(e)[:100])
+    # 3) macro from official keyless sources (FRED blocks/timeouts from GitHub runners)
     fallbacks = {
         "realyield": lambda: treasury("daily_treasury_real_yield_curve", "10 YR"),
         "tbill": lambda: treasury("daily_treasury_bill_rates", "13 WEEKS COUPON EQUIVALENT", 2003),
