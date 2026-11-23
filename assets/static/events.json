@@ -1,0 +1,16 @@
+[
+  {"d": "2001-09-11", "en": "9/11 attacks", "tr": "11 Eylül saldırıları"},
+  {"d": "2008-09-15", "en": "Lehman Brothers collapses", "tr": "Lehman Brothers çöküşü"},
+  {"d": "2008-11-25", "en": "Fed launches QE1", "tr": "Fed QE1'i başlatıyor"},
+  {"d": "2011-09-06", "en": "Gold peaks near $1,920", "tr": "Altın 1.920$ civarında zirve"},
+  {"d": "2013-04-15", "en": "Gold crash: worst 2-day drop in 30 years", "tr": "Altın çöküşü: 30 yılın en sert 2 günlük düşüşü"},
+  {"d": "2015-12-16", "en": "Fed's first hike since 2006", "tr": "Fed 2006'dan beri ilk faiz artışı"},
+  {"d": "2016-06-24", "en": "Brexit referendum result", "tr": "Brexit referandum sonucu"},
+  {"d": "2020-03-16", "en": "COVID crash; Fed cuts to zero", "tr": "COVID çöküşü; Fed faizi sıfırladı"},
+  {"d": "2020-08-06", "en": "Gold record above $2,000", "tr": "Altın 2.000$ üzerinde rekor"},
+  {"d": "2022-02-24", "en": "Russia invades Ukraine", "tr": "Rusya Ukrayna'yı işgal etti"},
+  {"d": "2022-03-16", "en": "Fed starts hiking cycle", "tr": "Fed faiz artırım döngüsüne başladı"},
+  {"d": "2023-03-10", "en": "SVB collapse", "tr": "SVB çöküşü"},
+  {"d": "2025-04-22", "en": "Gold touches $3,500", "tr": "Altın 3.500$'a dokundu"},
+  {"d": "2025-10-08", "en": "Gold crosses $4,000", "tr": "Altın 4.000$'ı aştı"}
+]

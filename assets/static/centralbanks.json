@@ -1,0 +1,39 @@
+{
+  "note_en": "Official gold reserves in tonnes. Most figures are as of the start of 2026; Poland, Uzbekistan, Kazakhstan and the Czech Republic use the latest World Gold Council monthly figures (mid/late 2026). Sources: World Gold Council (IMF IFS, central banks), BullionVault.",
+  "note_tr": "Resmi altın rezervleri (ton). Çoğu rakam 2026 başı itibarıyladır; Polonya, Özbekistan, Kazakistan ve Çekya için Dünya Altın Konseyi'nin en son aylık verileri (2026 ortası/sonu) kullanılmıştır. Kaynak: Dünya Altın Konseyi (IMF IFS, merkez bankaları), BullionVault.",
+  "total_central_banks_t": 39300,
+  "countries": [
+    {"name": "United States", "name_tr": "ABD", "iso": 840, "t": 8133.5, "t2021": 8133.5, "asof": "2026-01"},
+    {"name": "Germany", "name_tr": "Almanya", "iso": 276, "t": 3350.3, "asof": "2026-01"},
+    {"name": "Italy", "name_tr": "İtalya", "iso": 380, "t": 2451.8, "t2021": 2451.8, "asof": "2026-01"},
+    {"name": "France", "name_tr": "Fransa", "iso": 250, "t": 2437.0, "asof": "2026-01"},
+    {"name": "Russia", "name_tr": "Rusya", "iso": 643, "t": 2326.5, "asof": "2026-01"},
+    {"name": "China", "name_tr": "Çin", "iso": 156, "t": 2306.3, "asof": "2026-01"},
+    {"name": "Switzerland", "name_tr": "İsviçre", "iso": 756, "t": 1039.9, "asof": "2026-01"},
+    {"name": "India", "name_tr": "Hindistan", "iso": 356, "t": 880.3, "t2021": 676.6, "asof": "2026-01"},
+    {"name": "Japan", "name_tr": "Japonya", "iso": 392, "t": 846.0, "t2021": 765.2, "asof": "2026-01"},
+    {"name": "Poland", "name_tr": "Polonya", "iso": 616, "t": 648, "asof": "2026-08"},
+    {"name": "Türkiye", "name_tr": "Türkiye", "iso": 792, "t": 614.3, "asof": "2026-01"},
+    {"name": "Netherlands", "name_tr": "Hollanda", "iso": 528, "t": 612.5, "asof": "2026-01"},
+    {"name": "Uzbekistan", "name_tr": "Özbekistan", "iso": 860, "t": 439, "asof": "2026-08"},
+    {"name": "Kazakhstan", "name_tr": "Kazakistan", "iso": 398, "t": 377, "asof": "2026-08"},
+    {"name": "United Kingdom", "name_tr": "Birleşik Krallık", "iso": 826, "t": 310.3, "asof": "2026-01"},
+    {"name": "Hungary", "name_tr": "Macaristan", "iso": 348, "t": 110.0, "t2021": 31.5, "asof": "2026-01"},
+    {"name": "Czech Republic", "name_tr": "Çekya", "iso": 203, "t": 84, "t2021": 9.5, "asof": "2026-07"},
+    {"name": "Ireland", "name_tr": "İrlanda", "iso": 372, "t": 12.0, "asof": "2026-01"},
+    {"name": "Georgia", "name_tr": "Gürcistan", "iso": 268, "t": 7.1, "t2021": 0, "asof": "2026-01"},
+    {"name": "Zimbabwe", "name_tr": "Zimbabve", "iso": 716, "t": 4.1, "t2021": 0, "asof": "2026-01"}
+  ],
+  "highlights_en": [
+    "Central banks bought an estimated 863 tonnes in 2025 and 244 tonnes in Q1 2026 (WGC).",
+    "Poland was the top buyer in H1 2026 (82 t), followed by Uzbekistan, China and Kazakhstan.",
+    "The People's Bank of China reported its 22nd consecutive month of buying in August 2026.",
+    "Türkiye's central bank was a net seller in 2026, with about 85 t sold by July, linked to liquidity and FX operations."
+  ],
+  "highlights_tr": [
+    "Merkez bankaları 2025'te tahminen 863 ton, 2026'nın ilk çeyreğinde 244 ton altın aldı (WGC).",
+    "2026'nın ilk yarısında en büyük alıcı Polonya oldu (82 ton); onu Özbekistan, Çin ve Kazakistan izledi.",
+    "Çin Halk Bankası Ağustos 2026'da üst üste 22. ay alım yaptığını bildirdi.",
+    "TCMB 2026'da net satıcı oldu; temmuza kadar likidite ve döviz işlemleriyle bağlantılı yaklaşık 85 ton sattı."
+  ]
+}
