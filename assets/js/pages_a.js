@@ -26,16 +26,27 @@ export function dashboard(root) {
     h('div', { class: 'page-head' }, h('h1', {}, t('dash_title')), h('p', { class: 'muted' }, t('dash_sub'))),
     bar, gridEl);
 
-  const narrow = window.innerWidth < 760;
-  if (narrow) {
-    // phones: one column in reading order, not draggable (so scrolling works)
+  // full: user's saved 12-column layout · medium: two panels per row · narrow: one column
+  const mode = window.innerWidth < 760 ? 'narrow' : window.innerWidth < 1100 ? 'medium' : 'full';
+  const narrow = mode !== 'full'; // only the full layout is saved
+  const ordered = [...layout].sort((a, b) => a.y - b.y || a.x - b.x);
+  if (mode === 'narrow') {
     let y = 0;
-    layout = [...layout].sort((a, b) => a.y - b.y || a.x - b.x).map(it => { const o = { ...it, x: 0, y, w: 1 }; y += it.h; return o; });
+    layout = ordered.map(it => { const o = { ...it, x: 0, y, w: 1 }; y += it.h; return o; });
+  } else if (mode === 'medium') {
+    // chart spans the full width; other panels fill a two-column masonry in reading order
+    const colY = [0, 0]; const out = [];
+    const med = [...ordered.filter(i => i.id === 'chart'), ...ordered.filter(i => i.id !== 'chart')];
+    for (const it of med) {
+      if (it.id === 'chart') { const y = Math.max(...colY); out.push({ ...it, x: 0, y, w: 12 }); colY[0] = colY[1] = y + it.h; continue; }
+      const c = colY[0] <= colY[1] ? 0 : 1;
+      out.push({ ...it, x: c * 6, y: colY[c], w: 6 }); colY[c] += it.h;
+    }
+    layout = out;
   }
-  const grid = window.GridStack.init(narrow
+  const grid = window.GridStack.init(mode === 'narrow'
     ? { column: 1, cellHeight: 64, margin: 5, float: false, staticGrid: true, disableOneColumnMode: true }
-    : { column: 12, cellHeight: 64, margin: 7, handle: '.w-head', float: false, animate: true,
-        columnOpts: { breakpoints: [{ w: 1100, c: 6 }], layout: 'list' }, staticGrid: locked }, gridEl);
+    : { column: 12, cellHeight: 64, margin: 7, handle: '.w-head', float: false, animate: true, disableOneColumnMode: true, staticGrid: locked }, gridEl);
 
   function renderBody(id, body) {
     cleanups.get(id)?.();
