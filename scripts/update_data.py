@@ -186,19 +186,31 @@ def treasury(kind: str, col_match: str, start_year: int = 2003) -> pd.Series:
     return pd.concat(parts).dropna().sort_index()
 
 
-def bls_cpi() -> pd.Series:
-    """US CPI-U (CUUR0000SA0) from the keyless BLS v1 API, 10-year chunks."""
+def bls(series_id: str, start: int = 1990) -> pd.Series:
+    """Monthly series from the keyless BLS v1 API (10-year chunks). Placeholder values like '-' are skipped."""
     vals = {}
     now = datetime.now().year
-    for y0 in range(1990, now + 1, 10):
+    for y0 in range(start, now + 1, 10):
         r = requests.post("https://api.bls.gov/publicAPI/v1/timeseries/data/", json={
-            "seriesid": ["CUUR0000SA0"], "startyear": str(y0), "endyear": str(min(y0 + 9, now))}, headers=UA, timeout=30)
+            "seriesid": [series_id], "startyear": str(y0), "endyear": str(min(y0 + 9, now))}, headers=UA, timeout=30)
         for d in r.json()["Results"]["series"][0]["data"]:
             if d["period"].startswith("M") and d["period"] != "M13":
-                vals[pd.Timestamp(int(d["year"]), int(d["period"][1:]), 1)] = float(d["value"])
+                try:
+                    vals[pd.Timestamp(int(d["year"]), int(d["period"][1:]), 1)] = float(d["value"])
+                except ValueError:
+                    continue
     if not vals:
         raise RuntimeError("bls: no data")
     return pd.Series(vals).sort_index()
+
+
+def macro_from_prev(key: str):
+    """Re-use a monthly series from the previous run (BLS allows few keyless calls per day)."""
+    prev = prev_archive("macro.json", {})
+    m = prev.get(key)
+    if not m:
+        return None
+    return pd.Series(m["values"], index=pd.to_datetime(m["dates"]), dtype="float64").dropna()
 
 
 # ---------------------------------------------------------------- mock data
@@ -291,11 +303,19 @@ def collect():
     fallbacks = {
         "realyield": lambda: treasury("daily_treasury_real_yield_curve", "10 YR"),
         "tbill": lambda: treasury("daily_treasury_bill_rates", "13 WEEKS COUPON EQUIVALENT", 2003),
-        "cpi_us": bls_cpi,
+        "cpi_us": lambda: bls("CUUR0000SA0"),
+        "wage": lambda: bls("CES0500000011", 2006),
     }
+    refresh_monthly = datetime.now(timezone.utc).hour in (6, 18)
     for key, fn in fallbacks.items():
         if key in m:
             continue
+        if key in ("cpi_us", "wage") and not refresh_monthly:
+            prev = macro_from_prev(key)
+            if prev is not None and len(prev):
+                m[key] = prev
+                log(key, True, f"kept from previous run ({len(prev)} rows)")
+                continue
         try:
             m[key] = fn()
             log(key, True, f"fallback {len(m[key])} rows")
