@@ -51,7 +51,7 @@ def log(name: str, ok: bool, info: str = "") -> None:
     print(("OK   " if ok else "FAIL ") + name + (" - " + info if info else ""), flush=True)
 
 
-def http_get(url: str, params=None, tries: int = 3, timeout: int = 30, headers=None):
+def http_get(url: str, params=None, tries: int = 2, timeout: int = 25, headers=None):
     last = None
     for i in range(tries):
         try:
@@ -61,7 +61,8 @@ def http_get(url: str, params=None, tries: int = 3, timeout: int = 30, headers=N
             last = f"HTTP {r.status_code}"
         except Exception as e:  # noqa: BLE001
             last = str(e)
-        time.sleep(2 + 3 * i)
+        if i < tries - 1:
+            time.sleep(2 + 3 * i)
     raise RuntimeError(f"{url}: {last}")
 
 
@@ -144,6 +145,62 @@ def fred(series_id: str) -> pd.Series:
     return pd.Series(vals.values, index=pd.to_datetime(df[dcol])).dropna()
 
 
+def yf_bulk(tickers, period="max", interval="1d"):
+    """Download close prices with yfinance (handles Yahoo cookies/crumb). Returns {ticker: Series}."""
+    import yfinance as yf
+    out = {}
+    df = yf.download(list(tickers), period=period, interval=interval, auto_adjust=False, progress=False,
+                     threads=False, group_by="column")
+    if df is None or df.empty:
+        return out
+    close = df["Close"] if "Close" in df.columns.get_level_values(0) else df
+    if isinstance(close, pd.Series):
+        close = close.to_frame(name=list(tickers)[0])
+    for tk in close.columns:
+        sr = close[tk].dropna().astype("float64")
+        if not len(sr):
+            continue
+        idx = sr.index
+        if interval == "1d":
+            idx = pd.DatetimeIndex(idx).tz_localize(None) if getattr(idx, "tz", None) is not None else pd.DatetimeIndex(idx)
+            sr.index = idx.normalize()
+            sr = sr[~sr.index.duplicated(keep="last")]
+        out[tk] = sr
+    return out
+
+
+def treasury(kind: str, col_match: str, start_year: int = 2003) -> pd.Series:
+    """US Treasury daily rates CSV (keyless). kind: daily_treasury_real_yield_curve | daily_treasury_bill_rates"""
+    parts = []
+    for y in range(start_year, datetime.now().year + 1):
+        try:
+            r = http_get(f"https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/{y}/all",
+                         params={"type": kind, "field_tdr_date_value": str(y), "page": "", "_format": "csv"}, tries=2, timeout=30)
+            df = pd.read_csv(io.StringIO(r.text))
+            col = next(c for c in df.columns if col_match.lower() in c.lower())
+            parts.append(pd.Series(pd.to_numeric(df[col], errors="coerce").values, index=pd.to_datetime(df["Date"])))
+        except Exception as e:  # noqa: BLE001
+            print("treasury", kind, y, e)
+    if not parts:
+        raise RuntimeError("treasury: no data")
+    return pd.concat(parts).dropna().sort_index()
+
+
+def bls_cpi() -> pd.Series:
+    """US CPI-U (CUUR0000SA0) from the keyless BLS v1 API, 10-year chunks."""
+    vals = {}
+    now = datetime.now().year
+    for y0 in range(1990, now + 1, 10):
+        r = requests.post("https://api.bls.gov/publicAPI/v1/timeseries/data/", json={
+            "seriesid": ["CUUR0000SA0"], "startyear": str(y0), "endyear": str(min(y0 + 9, now))}, headers=UA, timeout=30)
+        for d in r.json()["Results"]["series"][0]["data"]:
+            if d["period"].startswith("M") and d["period"] != "M13":
+                vals[pd.Timestamp(int(d["year"]), int(d["period"][1:]), 1)] = float(d["value"])
+    if not vals:
+        raise RuntimeError("bls: no data")
+    return pd.Series(vals).sort_index()
+
+
 # ---------------------------------------------------------------- mock data
 
 def mock_series(start: str, mu: float, sig: float, s0: float, seed: int, freq="B") -> pd.Series:
@@ -200,45 +257,50 @@ def collect():
             log(k, True, "mock")
         return m
     m = {}
+    # 1) yfinance bulk (primary)
+    try:
+        got = yf_bulk(YAHOO.values())
+        for key, sym in YAHOO.items():
+            if sym in got and len(got[sym]) > 20:
+                sr = got[sym]
+                m[key] = 1.0 / sr if key in INVERT else sr
+                log(key, True, f"yfinance {sym} {len(sr)} rows")
+    except Exception as e:  # noqa: BLE001
+        log("yfinance", False, str(e))
+    # 2) raw Yahoo chart API for anything missing
     for key, sym in YAHOO.items():
-        s = None
+        if key in m:
+            continue
         try:
-            s = yahoo(sym)
-            log(key, True, f"yahoo {sym} {len(s)} rows")
+            sr = yahoo(sym)
+            m[key] = 1.0 / sr if key in INVERT else sr
+            log(key, True, f"yahoo {sym} {len(sr)} rows")
         except Exception as e:  # noqa: BLE001
-            log(key, False, str(e))
-            if key in STOOQ_FALLBACK:
-                try:
-                    s = stooq(STOOQ_FALLBACK[key])
-                    log(key, True, f"stooq fallback {len(s)} rows")
-                except Exception as e2:  # noqa: BLE001
-                    log(key + "_stooq", False, str(e2))
-        if s is not None and len(s):
-            if key in INVERT:
-                s = 1.0 / s
-            m[key] = s
-        time.sleep(0.4)
-    # long gold & silver history (spot) from stooq, spliced before Yahoo begins
-    for key, sym in (("gold", "xauusd"), ("silver", "xagusd")):
-        try:
-            long = stooq(sym)
-            if key in m:
-                first = m[key].index.min()
-                head = long[long.index < first]
-                if len(head):
-                    ratio = m[key].iloc[0] / long[long.index >= first].iloc[0] if (long.index >= first).any() else 1
-                    m[key] = pd.concat([head * ratio, m[key]])
-            else:
-                m[key] = long
-            log(key + "_long", True, f"stooq {sym} back to {m[key].index.min().date()}")
-        except Exception as e:  # noqa: BLE001
-            log(key + "_long", False, str(e))
+            log(key, False, str(e)[:120])
+        time.sleep(0.5)
+    # 3) macro: FRED first (short timeout), then official fallbacks
     for key, sid in FRED.items():
         try:
-            m[key] = fred(sid)
+            r = http_get("https://fred.stlouisfed.org/graph/fredgraph.csv", params={"id": sid}, tries=1, timeout=40)
+            df = pd.read_csv(io.StringIO(r.text))
+            vals = pd.to_numeric(df[sid], errors="coerce")
+            m[key] = pd.Series(vals.values, index=pd.to_datetime(df[df.columns[0]])).dropna()
             log(key, True, f"FRED {sid} {len(m[key])} rows")
         except Exception as e:  # noqa: BLE001
-            log(key, False, str(e))
+            log(key, False, "FRED " + str(e)[:100])
+    fallbacks = {
+        "realyield": lambda: treasury("daily_treasury_real_yield_curve", "10 YR"),
+        "tbill": lambda: treasury("daily_treasury_bill_rates", "13 WEEKS COUPON EQUIVALENT", 2003),
+        "cpi_us": bls_cpi,
+    }
+    for key, fn in fallbacks.items():
+        if key in m:
+            continue
+        try:
+            m[key] = fn()
+            log(key, True, f"fallback {len(m[key])} rows")
+        except Exception as e:  # noqa: BLE001
+            log(key + "_fallback", False, str(e)[:150])
     try:
         r = http_get("https://raw.githubusercontent.com/TheEconomist/big-mac-data/master/output-data/big-mac-full-index.csv")
         df = pd.read_csv(io.StringIO(r.text))
@@ -293,9 +355,16 @@ def build_intraday(m):
         out["series"]["gold"] = [[int(t.timestamp()), clean(v, 2)] for t, v in zip(idx, vals)]
         log("intraday", True, "mock")
     else:
+        got = {}
+        try:
+            got = yf_bulk(["GC=F", "SI=F"], period="5d", interval="15m")
+        except Exception as e:  # noqa: BLE001
+            log("intraday_yf", False, str(e)[:120])
         for key, sym in (("gold", "GC=F"), ("silver", "SI=F")):
             try:
-                s = yahoo(sym, "5d", "15m")
+                s = got.get(sym)
+                if s is None or not len(s):
+                    s = yahoo(sym, "5d", "15m")
                 out["series"][key] = [[int(t.timestamp()), clean(v, 3)] for t, v in s.items()]
                 log("intraday_" + key, True, f"{len(s)} pts")
             except Exception as e:  # noqa: BLE001
